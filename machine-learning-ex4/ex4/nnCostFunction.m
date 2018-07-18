@@ -62,12 +62,29 @@ Theta2_grad = zeros(size(Theta2));
 %               and Theta2_grad from Part 2.
 %
 
+X = [ones(m, 1) X];
 
-total = 0
-for i = 1:m:
-  display(m)
+z2 = Theta1 * X';
+a2 = sigmoid(z2);
+a2 = [ones(1, size(a2, 2)); a2];
+z3 = Theta2 * a2;
+a3 = sigmoid(z3);
+
+total = 0;
+delta3 = zeros(num_labels, 1);
+delta2 = zeros(hidden_layer_size, 1);
+delta = zeros(input_layer_size, size(y, 1));
+for i = 1:m
+  expected = [zeros(y(i) - 1,1 ); 1; zeros(num_labels - y(i), 1)];
+  sigK = sum(-expected .*  log(a3(:, i)) - (ones(num_labels, 1) - expected) .* log(ones(num_labels, 1) - a3(:, i)));
+  total += sigK;
+  % delta3 = a3 - expected;
+  % delta2 = Theta2' * delta3 .* sigmoidGradient(z2)
+  % delta2 = delta2(2:end);
 end
-J = (1/m) * total
+reg1 = Theta1(:, 2 : size(Theta1, 2)) .^ 2;
+reg2 = Theta2(:, 2 : size(Theta2, 2)) .^ 2;
+J = (1/m) * total  + (lambda/ (2 * m)) * (sum(sum(reg1)) + sum(sum(reg2)));
 
 
 
